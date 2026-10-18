@@ -1,0 +1,34 @@
+# Replace model paths; student and teachers must share a tokenizer.
+# Student: 16 GPUs; teachers: 4 + 2 + 2 GPUs; total rollout GPUs: 24.
+sglang:
+  - name: default
+    update_weights: true
+    num_gpus_per_engine: 4
+    server_groups:
+      - worker_type: regular
+        num_gpus: 16
+  - name: codeio_teacher
+    model_path: /path/to/teachers/codeio
+    update_weights: false
+    num_gpus_per_engine: 4
+    server_groups:
+      - worker_type: regular
+        num_gpus: 4
+  - name: math_teacher
+    model_path: /path/to/teachers/math
+    update_weights: false
+    num_gpus_per_engine: 2
+    server_groups:
+      - worker_type: regular
+        num_gpus: 2
+        overrides:
+          ep_size: 2
+  - name: if_teacher
+    model_path: /path/to/teachers/if
+    update_weights: false
+    num_gpus_per_engine: 2
+    server_groups:
+      - worker_type: regular
+        num_gpus: 2
+        overrides:
+          ep_size: 2

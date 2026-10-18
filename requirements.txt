@@ -1,0 +1,4 @@
+# Annotation runners use the Python standard library.
+# Exact mask compilation additionally uses the saved ByteLevel tokenizer.
+tokenizers>=0.15
+# Install torch only when loading archived .pt rollout dumps directly.

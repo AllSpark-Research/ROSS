@@ -1,0 +1,108 @@
+You audit a SEGMENT-LEVEL annotation of a model response. Two checks.
+
+CHECK A - kept-text self-containment and derivation completeness.
+The masked regions are shown as "[... masked ...]" between kept spans. The kept
+text alone must be coherent, reach the correct final answer, AND actually show
+the DERIVATION (not just setup + conclusion with the derivation in a masked gap).
+Flag a problem if the kept text:
+- uses a variable / case / enumeration that was never introduced in the kept text;
+- has an unexplained logical jump where a masked region clearly held a needed step;
+- reads like "Problem setup ... [big masked gap] ... Answer: X" (dangling answer);
+- does not reach the correct final answer, or omits the explicit final Answer line
+  present in the original response (a format omission, not a numerical mismatch);
+- retains a demonstrably false intermediate claim, even if later corrected;
+- reaches only a necessary condition or candidate but lacks an essential existence,
+  attainability, or sufficiency step required by the question. Set derivation_shown=false
+  for such a real proof gap; do not invent the missing step from ground truth.
+Do not demand proof of facts given by the problem or flag routine valid omissions.
+
+CHECK B - missed wrong branches in the FULL response.
+Use the full response as context, but report wrong / abandoned / speculative
+content only when it still lies INSIDE the KEPT text (not inside a masked gap).
+Do not trust the first annotation or the final answer as evidence that the kept
+intermediate claims are correct. Check numerical counts, signs, incompatible
+claims, and necessary-versus-sufficient reasoning. A later correction does not
+cancel an earlier error that is still supervised.
+
+
+EVIDENCE CHECK (do not substitute a fluent summary for verification)
+Before deciding severity, compare passages that assert incompatible numerical
+results for the SAME case. Independently recompute state/count updates from the
+initial condition, not from a later claimed result. Inspect universal claims
+("all", "every", "only", "equivalent") for an unjustified change of quantifier;
+use a small counterexample when applicable. Check whether alleged distinct
+objects differ only in how the response describes or subdivides them.
+A false assertion later corrected is still an error if it remains in KEPT text.
+A declared temporary assumption correctly refuted, or a valid verification,
+is not such an error. Restore no error merely to improve textual continuity.
+FIRST perform a contradiction scan across the ENTIRE kept text, before selecting
+any convenient correct equations. Collect pairs of passages about the SAME count,
+state, classification, or identity that assert different results. Include explicit
+corrections and changes of conclusion; do not skip a pair because the later passage
+is correct. In conflict_pairs quote BOTH passages, decide whether they describe the
+same case or genuinely different assumptions, and independently check the disputed
+step. A temporary hypothesis correctly refuted is not an erroneous assertion.
+If a contradictory pair exists, do not return conflict_pairs=[] and substitute
+unrelated passing checks. Do not invent conflicts between different cases.
+THEN report 2-4 short checked_claims as audit evidence, including the disputed
+claims above and at least one nontrivial latter-half claim when present.
+Each uses a verbatim quote and a concise independent calculation, counterexample,
+or premise check (not an extended derivation). Include found failures, not just
+convenient correct setup equations. checked_claims is diagnostic: any false KEPT
+claim must ALSO appear in issues and in a verbatim 40+ character missed_masks
+quote, with neighboring kept context as necessary. Missing proof is reported
+as derivation_shown=false, not as an invented quote. A passing final answer does
+not justify severity=none when a checked intermediate claim fails.
+
+STRICT REQUIREMENTS FOR listing an item in `missed_masks`:
+  (1) You MUST quote the content VERBATIM from the response, copy-paste unchanged.
+      Do NOT paraphrase. Do NOT summarize. Do NOT describe.
+  (2) Each quoted string must be at least 40 characters long, and must appear
+      exactly in the response.
+  (3) If you cannot produce a verbatim ≥40-char quote for a suspected miss, DO
+      NOT list it. Prefer an empty missed_masks list over paraphrases.
+  (4) Do NOT list content that IS inside a masked region (i.e., not in kept text).
+      If the content appears as part of the "[... masked ...]" gap in the kept
+      text you were shown, it is ALREADY masked; do not report it.
+
+Return JSON only in a fenced block:
+```json
+{"coherent": true/false,
+ "reaches_correct_answer": true/false,
+ "derivation_shown": true/false,
+ "severity": "none" | "minor" | "major",
+ "issues": ["short concrete issue A (self-contained problem in kept text)"],
+ "missed_masks": ["EXACT 40+ char verbatim quote from response"],
+ "conflict_pairs": [{"earlier_quote": "verbatim earlier claim", "later_quote": "verbatim conflicting claim", "same_case": true, "check": "brief independent check; identify which claim fails or why this is a valid case split"}],
+ "checked_claims": [{"quote": "verbatim kept claim", "check": "short independent check", "verdict": "pass | fail | not_established"}]}
+```
+Set severity=major for dangling references, broken logic, demonstrably false kept
+claims, or missing essential derivation. Describe the concrete error in issues;
+for a false kept claim also quote it verbatim in missed_masks, including enough
+neighboring kept text to meet the length requirement. Do not invent a quote for
+an absent step; describe the gap and set derivation_shown=false instead. Set severity=minor for terse-but-followable
+kept text with no missed_masks. Set severity=none if fully coherent AND missed_masks
+is empty AND derivation_shown is true.
+
+
+SUPERVISION CORRECTNESS, NOT JUST EVENTUAL SELF-CORRECTION:
+Audit each retained assertion as a supervision target. A later correction does
+NOT make an earlier false asserted calculation, count, classification, or identity
+correct or safe to supervise. If your own check says an assertion is wrong, its
+verdict must be fail, even if the response later fixes it. Put that retained false
+passage in issues and missed_masks (a verbatim continuous quote of at least 40
+characters, including enough context to locate the false assertion), set severity
+to major, and coherent to false. Keep the valid correction and its dependencies.
+Do not use "self-corrected", "Wait", or "progressive derivation" to excuse keeping
+a positively asserted false result. Before returning, check that no check says
+"wrong/incorrect/false" while its verdict is pass or issues is empty.
+
+Distinguish a genuine conditional exploration ("suppose X; this leads to a
+contradiction, so reject X") from a false assertion later retracted ("X is the
+answer. Wait, X is wrong; Y is the answer"). The former may be valid reasoning;
+the latter requires masking the erroneous asserted branch while keeping the
+successful derivation. Preserve a correct sentence explaining WHY a prior claim
+fails. Scan both before and after every explicit correction or changed conclusion;
+do not inspect only the final successful reasoning. If removing the wrong passage
+leaves a pronoun or dangling continuation, report the smallest complete erroneous
+passage and preserve/reselect an independently understandable correct span.

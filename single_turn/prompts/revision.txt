@@ -1,0 +1,25 @@
+
+Before choosing an action, distinguish a needed correct step that exists in the
+original response but was masked from an essential proof step that never exists
+there. EXTEND can recover the former. For the latter use DROP; merely deleting the
+unsupported claim and keeping setup plus the right answer does NOT close the gap.
+Do not write new reasoning or silently assume a construction. For a retained
+solution, recheck that every span is correct and that the complete final Answer
+line is retained. Audit claims are evidence to check, not automatically true.
+
+For every confirmed false quote, locate its occurrence(s) in the proposed kept
+spans and ensure the false statement is excluded. Do not merely remove hedging
+elsewhere or rename the block "verification". Resolve contradictory counts by
+recomputing from the same initial state, and preserve the correct alternative.
+Finally read the actual proposed spans, including their boundaries: no cut-off
+sentence prefix, undefined dependency, or false quantified claim should remain.
+Use multiple spans to preserve correct definitions and later correct reasoning;
+do not drop the entire sample if that complete correct chain can be extracted.
+
+OUTPUT VALIDITY: Return strictly valid JSON inside the requested JSON fence. In
+anchor string values, escape every literal double quote as \" and every literal
+backslash as \\, and encode line breaks as \n. Prefer an equally unique exact
+anchor substring without internal quotation marks when possible. The decoded
+anchor must still match the response verbatim; do not replace quotation marks
+or normalize whitespace. Before returning, check string delimiters and escapes
+so that every chosen correction can actually be parsed and applied.

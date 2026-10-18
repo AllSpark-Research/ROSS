@@ -1,0 +1,41 @@
+{
+  "math": {
+    "rows": 3000,
+    "bytes": 3370740,
+    "sha256": "f085441e4aa43d7f15c20df532556b00964bf95bcf5cb7ad9933cd4bb16ea096",
+    "metadata_fields_removed": {
+      "extra_info.file_path": 3000,
+      "extra_info.source_path": 3000,
+      "metadata.source_path": 3000,
+      "metadata.reward_spec.extra_info.file_path": 3000,
+      "metadata.reward_spec.extra_info.source_path": 3000
+    },
+    "data_sources": {
+      "math_dapo": 3000
+    }
+  },
+  "codeio": {
+    "rows": 11980,
+    "bytes": 77359369,
+    "sha256": "f0fdc3677dd272fee491d5e808644fe73378d66e47d9b2627194d5ff87935006",
+    "metadata_fields_removed": {},
+    "data_sources": {
+      "simulation__codeio": 5991,
+      "simulation__codeio_input_exec": 5989
+    }
+  },
+  "if": {
+    "rows": 10000,
+    "bytes": 20616871,
+    "sha256": "51840e55534738d61b5c3ca0a2494c042bc9a3b4e40c60f03f1d9d9fb64c2831",
+    "metadata_fields_removed": {},
+    "data_sources": {
+      "nemotron_if_rl": 10000
+    },
+    "text_redactions": {
+      "credential_occurrences": 4,
+      "personal_path_occurrences": 26
+    },
+    "rows_with_text_redactions": 11
+  }
+}
